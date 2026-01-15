@@ -1,0 +1,426 @@
+<mujoco model="modern_apartment_optimized">
+  <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+
+  <option timestep="0.005" gravity="0 0 -9.81">
+    <flag warmstart="enable"/>
+  </option>
+
+  <asset>
+    <!-- 现代简约风格材质 -->
+    <material name="floor_wood" rgba="0.88 0.84 0.76 1" specular="0.4" shininess="0.3"/>
+    <material name="wall_white" rgba="0.97 0.97 0.95 1" specular="0.1" shininess="0.05"/>
+    <material name="wallpaper_gray" rgba="0.85 0.85 0.87 1" specular="0.05" shininess="0.02"/>
+    <material name="wallpaper_beige" rgba="0.92 0.89 0.84 1" specular="0.05" shininess="0.02"/>
+    <material name="wood_natural" rgba="0.84 0.73 0.57 1" specular="0.2" shininess="0.15"/>
+    <material name="wood_walnut" rgba="0.46 0.36 0.29 1" specular="0.25" shininess="0.2"/>
+    <material name="fabric_beige" rgba="0.89 0.86 0.79 1" specular="0.04" shininess="0.02"/>
+    <material name="fabric_gray" rgba="0.66 0.66 0.68 1" specular="0.04" shininess="0.02"/>
+    <material name="metal_brushed" rgba="0.76 0.76 0.76 1" specular="0.7" shininess="0.4"/>
+    <material name="glass_clear" rgba="0.86 0.93 0.96 0.35" specular="0.9" shininess="0.8"/>
+    <material name="black_matte" rgba="0.16 0.16 0.16 1" specular="0.1" shininess="0.05"/>
+    <material name="white_matte" rgba="0.99 0.99 0.99 1" specular="0.1" shininess="0.05"/>
+    <material name="carpet_cream" rgba="0.93 0.89 0.83 1" specular="0.02" shininess="0.01"/>
+    <material name="cushion_linen" rgba="0.92 0.90 0.86 1" specular="0.03" shininess="0.01"/>
+  </asset>
+
+  <worldbody>
+    <!-- 照明 -->
+    <light directional="true" diffuse="0.75 0.75 0.75" specular="0.3 0.3 0.3" pos="0 0 10" dir="0 0 -1"/>
+    <light directional="true" diffuse="0.45 0.45 0.45" specular="0.2 0.2 0.2" pos="6 6 8" dir="-1 -1 -1"/>
+    <light directional="true" diffuse="0.35 0.35 0.35" specular="0.15 0.15 0.15" pos="-6 -6 8" dir="1 1 -1"/>
+
+    <!-- 地板 (12m x 10m) -->
+    <geom name="floor" type="plane" size="6 5 0.1" pos="0 0 0" material="floor_wood"/>
+
+    <!-- ========== 外墙 ========== -->
+    <!-- 北墙 -->
+    <geom name="wall_north" type="box" size="6 0.12 1.5" pos="0 5.12 1.5" material="wall_white"/>
+
+    <!-- 南墙 -->
+    <geom name="wall_south" type="box" size="6 0.12 1.5" pos="0 -5.12 1.5" material="wall_white"/>
+
+    <!-- 东墙 -->
+    <geom name="wall_east" type="box" size="0.12 5 1.5" pos="6.12 0 1.5" material="wall_white"/>
+
+    <!-- 西墙 -->
+    <geom name="wall_west" type="box" size="0.12 5 1.5" pos="-6.12 0 1.5" material="wall_white"/>
+
+    <!-- ========== 内墙（分隔客厅和卧室）========== -->
+    <!-- 水平分隔墙 - 西段（卧室1左侧到门1） -->
+    <geom name="wall_h_west" type="box" size="2.6 0.12 1.5" pos="-3.5 1.5 1.5" material="wall_white"/>
+
+    <!-- 门1框架（卧室1门） -->
+    <geom name="door1_frame_left" type="box" size="0.05 0.12 1.5" pos="-0.85 1.5 1.5" material="white_matte"/>
+    <geom name="door1_frame_right" type="box" size="0.05 0.12 1.5" pos="0.85 1.5 1.5" material="white_matte"/>
+    <geom name="door1_frame_top" type="box" size="0.9 0.12 0.1" pos="0 1.5 2.1" material="white_matte"/>
+    <geom name="door1_panel" type="box" size="0.75 0.08 0.95" pos="0 1.46 1.05" material="wood_natural"/>
+    <geom name="door1_handle" type="cylinder" size="0.02 0.08" pos="0.6 1.38 1.05" material="metal_brushed" euler="0 90 0"/>
+
+    <!-- 水平分隔墙 - 东段（门1到东墙） -->
+    <geom name="wall_h_east" type="box" size="4.4 0.12 1.5" pos="3.7 1.5 1.5" material="wall_white"/>
+
+    <!-- 卧室间的垂直分隔墙（仅在北部） -->
+    <geom name="wall_v_bedroom" type="box" size="0.12 3.5 1.5" pos="0 3.62 1.5" material="wall_white"/>
+
+    <!-- ========== 壁纸装饰 ========== -->
+    <!-- 客厅南墙壁纸 -->
+    <geom name="wallpaper_living_south" type="box" size="5.5 0.01 1.3" pos="0 -5.11 1.4" material="wallpaper_gray"/>
+
+    <!-- 卧室1北墙壁纸 -->
+    <geom name="wallpaper_bed1_north" type="box" size="2.8 0.01 1.2" pos="-3.2 5.11 1.4" material="wallpaper_beige"/>
+
+    <!-- 卧室2北墙壁纸 -->
+    <geom name="wallpaper_bed2_north" type="box" size="2.8 0.01 1.2" pos="3.2 5.11 1.4" material="wallpaper_beige"/>
+
+    <!-- ========== 客厅区域 ========== -->
+
+    <!-- 现代简约沙发（面向南，朝向电视） -->
+    <body name="sofa" pos="0 0.3 0">
+      <!-- 沙发底座框架 -->
+      <geom type="box" size="1.45 0.48 0.07" pos="0 0 0.07" material="wood_walnut"/>
+      <!-- 沙发薄坐垫 -->
+      <geom type="box" size="1.40 0.45 0.07" pos="0 0 0.21" material="fabric_beige"/>
+      <!-- 沙发靠背 -->
+      <geom type="box" size="1.40 0.13 0.42" pos="0 0.35 0.56" material="fabric_beige"/>
+      <!-- 靠背软包 -->
+      <geom type="box" size="1.35 0.09 0.37" pos="0 0.39 0.56" material="fabric_gray"/>
+      <!-- 左扶手 -->
+      <geom type="box" size="0.13 0.48 0.30" pos="-1.32 0 0.44" material="fabric_beige"/>
+      <geom type="box" size="0.16 0.51 0.07" pos="-1.32 0 0.65" material="fabric_beige"/>
+      <!-- 右扶手 -->
+      <geom type="box" size="0.13 0.48 0.30" pos="1.32 0 0.44" material="fabric_beige"/>
+      <geom type="box" size="0.16 0.51 0.07" pos="1.32 0 0.65" material="fabric_beige"/>
+      <!-- 薄抱枕 -->
+      <geom type="box" size="0.30 0.07 0.30" pos="-0.75 0.38 0.36" material="cushion_linen"/>
+      <geom type="box" size="0.30 0.07 0.30" pos="0 0.38 0.36" material="cushion_linen"/>
+      <geom type="box" size="0.30 0.07 0.30" pos="0.75 0.38 0.36" material="cushion_linen"/>
+    </body>
+
+    <!-- 地毯（在茶几下） -->
+    <geom name="carpet" type="box" size="1.9 1.3 0.008" pos="0 -1.6 0.008" material="carpet_cream"/>
+
+    <!-- 现代茶几 -->
+    <body name="coffee_table" pos="0 -1.6 0">
+      <!-- 桌面 -->
+      <geom type="box" size="0.85 0.52 0.025" pos="0 0 0.40" material="wood_walnut"/>
+      <!-- 玻璃层 -->
+      <geom type="box" size="0.80 0.47 0.01" pos="0 0 0.445" material="glass_clear"/>
+      <!-- 金属腿 -->
+      <geom type="cylinder" size="0.025 0.18" pos="-0.70 -0.37 0.18" material="metal_brushed"/>
+      <geom type="cylinder" size="0.025 0.18" pos="0.70 -0.37 0.18" material="metal_brushed"/>
+      <geom type="cylinder" size="0.025 0.18" pos="-0.70 0.37 0.18" material="metal_brushed"/>
+      <geom type="cylinder" size="0.025 0.18" pos="0.70 0.37 0.18" material="metal_brushed"/>
+    </body>
+
+    <!-- 电视柜（靠南墙，留出间隙不重合） -->
+    <body name="tv_stand" pos="0 -4.7 0">
+      <!-- 柜体 -->
+      <geom type="box" size="1.25 0.38 0.24" pos="0 0 0.24" material="wood_walnut"/>
+      <!-- 台面 -->
+      <geom type="box" size="1.30 0.42 0.025" pos="0 0 0.505" material="wood_walnut"/>
+      <!-- 抽屉面板 -->
+      <geom type="box" size="0.52 0.02 0.13" pos="-0.62 0.38 0.24" material="wood_natural"/>
+      <geom type="box" size="0.52 0.02 0.13" pos="0.62 0.38 0.24" material="wood_natural"/>
+      <!-- 金属拉手 -->
+      <geom type="box" size="0.09 0.015 0.015" pos="-0.62 0.42 0.24" material="metal_brushed"/>
+      <geom type="box" size="0.09 0.015 0.015" pos="0.62 0.42 0.24" material="metal_brushed"/>
+    </body>
+
+    <!-- 现代电视 -->
+    <body name="tv" pos="0 -4.6 0.53">
+      <!-- 电视屏幕 -->
+      <geom type="box" size="0.95 0.04 0.54" pos="0 0 0.54" material="black_matte"/>
+      <!-- 显示区域 -->
+      <geom type="box" size="0.90 0.02 0.50" pos="0 -0.02 0.54" rgba="0.12 0.14 0.17 1"/>
+      <!-- 底座 -->
+      <geom type="box" size="0.27 0.17 0.02" pos="0 0 -0.01" material="metal_brushed"/>
+      <geom type="box" size="0.045 0.12 0.11" pos="0 0 0.10" material="metal_brushed"/>
+    </body>
+
+    <!-- 餐桌（客厅西侧空余空间） -->
+    <body name="dining_table" pos="-3.6 -2.2 0">
+      <!-- 桌面 -->
+      <geom type="box" size="0.95 0.75 0.032" pos="0 0 0.75" material="wood_natural"/>
+      <!-- 桌腿 -->
+      <geom type="box" size="0.065 0.065 0.36" pos="-0.85 -0.65 0.36" material="wood_walnut"/>
+      <geom type="box" size="0.065 0.065 0.36" pos="0.85 -0.65 0.36" material="wood_walnut"/>
+      <geom type="box" size="0.065 0.065 0.36" pos="-0.85 0.65 0.36" material="wood_walnut"/>
+      <geom type="box" size="0.065 0.065 0.36" pos="0.85 0.65 0.36" material="wood_walnut"/>
+    </body>
+
+    <!-- 餐椅1（桌子西侧） -->
+    <body name="chair1" pos="-4.75 -2.2 0">
+      <geom type="box" size="0.23 0.23 0.04" pos="0 0 0.48" material="wood_natural"/>
+      <geom type="box" size="0.23 0.045 0.26" pos="0 0.19 0.66" material="wood_natural"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 0.19 0.23" material="wood_walnut"/>
+    </body>
+
+    <!-- 餐椅2（桌子东侧） -->
+    <body name="chair2" pos="-2.45 -2.2 0">
+      <geom type="box" size="0.23 0.23 0.04" pos="0 0 0.48" material="wood_natural"/>
+      <geom type="box" size="0.23 0.045 0.26" pos="0 -0.19 0.66" material="wood_natural"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 0.19 0.23" material="wood_walnut"/>
+    </body>
+
+    <!-- 餐椅3（桌子南侧） -->
+    <body name="chair3" pos="-3.6 -3.15 0">
+      <geom type="box" size="0.23 0.23 0.04" pos="0 0 0.48" material="wood_natural"/>
+      <geom type="box" size="0.23 0.045 0.26" pos="0 0.19 0.66" material="wood_natural"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 0.19 0.23" material="wood_walnut"/>
+    </body>
+
+    <!-- 餐椅4（桌子北侧） -->
+    <body name="chair4" pos="-3.6 -1.25 0">
+      <geom type="box" size="0.23 0.23 0.04" pos="0 0 0.48" material="wood_natural"/>
+      <geom type="box" size="0.23 0.045 0.26" pos="0 -0.19 0.66" material="wood_natural"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 -0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="-0.19 0.19 0.23" material="wood_walnut"/>
+      <geom type="cylinder" size="0.026 0.23" pos="0.19 0.19 0.23" material="wood_walnut"/>
+    </body>
+
+    <!-- 餐桌上的水果盘 -->
+    <body name="fruit_bowl" pos="-3.6 -2.2 0.782">
+      <!-- 盘子 -->
+      <geom type="cylinder" size="0.19 0.032" pos="0 0 0" material="white_matte"/>
+      <!-- 苹果 -->
+      <geom type="sphere" size="0.047" pos="-0.09 0 0.047" rgba="0.86 0.26 0.21 1"/>
+      <geom type="sphere" size="0.047" pos="0.09 0 0.047" rgba="0.86 0.26 0.21 1"/>
+      <!-- 橙子 -->
+      <geom type="sphere" size="0.042" pos="0 -0.09 0.042" rgba="0.96 0.61 0.21 1"/>
+      <geom type="sphere" size="0.042" pos="0 0.09 0.042" rgba="0.96 0.61 0.21 1"/>
+      <!-- 香蕉 -->
+      <geom type="capsule" size="0.026 0.065" pos="0.06 -0.06 0.09" rgba="0.96 0.86 0.31 1" euler="22 32 47"/>
+    </body>
+
+    <!-- 边几（客厅东侧） -->
+    <body name="side_table" pos="3.9 -3.6 0">
+      <!-- 桌面 -->
+      <geom type="cylinder" size="0.30 0.026" pos="0 0 0.54" material="wood_natural"/>
+      <!-- 金属腿（三脚） -->
+      <geom type="cylinder" size="0.022 0.26" pos="0.22 0 0.26" material="metal_brushed" euler="5 0 0"/>
+      <geom type="cylinder" size="0.022 0.26" pos="-0.11 0.19 0.26" material="metal_brushed" euler="5 0 120"/>
+      <geom type="cylinder" size="0.022 0.26" pos="-0.11 -0.19 0.26" material="metal_brushed" euler="5 0 240"/>
+    </body>
+
+    <!-- 装饰花瓶（边几上） -->
+    <body name="vase" pos="3.9 -3.6 0.566">
+      <!-- 花瓶 -->
+      <geom type="cylinder" size="0.065 0.16" pos="0 0 0.16" rgba="0.32 0.37 0.42 1"/>
+      <!-- 花茎 -->
+      <geom type="cylinder" size="0.009 0.13" pos="0 0 0.44" rgba="0.22 0.52 0.22 1"/>
+      <geom type="cylinder" size="0.009 0.11" pos="0.035 0.025 0.42" rgba="0.22 0.52 0.22 1"/>
+      <!-- 花朵 -->
+      <geom type="sphere" size="0.038" pos="0 0 0.57" rgba="0.92 0.72 0.77 1"/>
+      <geom type="sphere" size="0.032" pos="0.035 0.025 0.53" rgba="0.92 0.72 0.77 1"/>
+    </body>
+
+    <!-- ========== 卧室1 (西北区域) ========== -->
+
+    <!-- 双人床（床头靠北墙） -->
+    <body name="bed1" pos="-3.2 4.3 0">
+      <!-- 床架 -->
+      <geom type="box" size="1.05 1.15 0.13" pos="0 0 0.13" material="wood_walnut"/>
+      <!-- 床垫 -->
+      <geom type="box" size="1.00 1.10 0.19" pos="0 0 0.38" rgba="0.97 0.97 0.95 1"/>
+      <!-- 床单 -->
+      <geom type="box" size="1.00 1.10 0.02" pos="0 0 0.49" material="fabric_beige"/>
+      <!-- 床头板（靠墙） -->
+      <geom type="box" size="1.05 0.09 0.62" pos="0 0.67 0.74" material="wood_walnut"/>
+      <geom type="box" size="1.00 0.13 0.52" pos="0 0.64 0.74" material="fabric_gray"/>
+      <!-- 枕头 -->
+      <geom type="box" size="0.32 0.19 0.09" pos="-0.48 0.45 0.56" rgba="0.99 0.99 0.99 1"/>
+      <geom type="box" size="0.32 0.19 0.09" pos="0.48 0.45 0.56" rgba="0.99 0.99 0.99 1"/>
+    </body>
+
+    <!-- 床头柜1（左侧，紧靠床） -->
+    <body name="nightstand1" pos="-4.45 4.3 0">
+      <!-- 柜体 -->
+      <geom type="box" size="0.32 0.35 0.30" pos="0 0 0.30" material="wood_natural"/>
+      <!-- 台面 -->
+      <geom type="box" size="0.34 0.37 0.026" pos="0 0 0.626" material="wood_walnut"/>
+      <!-- 抽屉 -->
+      <geom type="box" size="0.28 0.02 0.11" pos="0 0.35 0.37" material="wood_walnut"/>
+      <geom type="box" size="0.06 0.012 0.012" pos="0 0.39 0.37" material="metal_brushed"/>
+      <!-- 台灯 -->
+      <geom type="cylinder" size="0.09 0.022" pos="0 0 0.67" material="metal_brushed"/>
+      <geom type="cylinder" size="0.017 0.19" pos="0 0 0.88" material="metal_brushed"/>
+      <geom type="sphere" size="0.11" pos="0 0 1.09" rgba="0.99 0.97 0.91 0.82"/>
+    </body>
+
+    <!-- 床头柜2（右侧，紧靠床） -->
+    <body name="nightstand2" pos="-1.95 4.3 0">
+      <geom type="box" size="0.32 0.35 0.30" pos="0 0 0.30" material="wood_natural"/>
+      <geom type="box" size="0.34 0.37 0.026" pos="0 0 0.626" material="wood_walnut"/>
+      <geom type="box" size="0.28 0.02 0.11" pos="0 0.35 0.37" material="wood_walnut"/>
+      <geom type="box" size="0.06 0.012 0.012" pos="0 0.39 0.37" material="metal_brushed"/>
+      <!-- 台灯 -->
+      <geom type="cylinder" size="0.09 0.022" pos="0 0 0.67" material="metal_brushed"/>
+      <geom type="cylinder" size="0.017 0.19" pos="0 0 0.88" material="metal_brushed"/>
+      <geom type="sphere" size="0.11" pos="0 0 1.09" rgba="0.99 0.97 0.91 0.82"/>
+    </body>
+
+    <!-- 衣柜（卧室1，靠西墙但不重合） -->
+    <body name="wardrobe1" pos="-5.7 4.4 0">
+      <!-- 柜体 -->
+      <geom type="box" size="0.32 0.65 1.20" pos="0 0 1.20" material="wood_walnut"/>
+      <!-- 左门 -->
+      <geom type="box" size="0.032 0.30 1.12" pos="0.30 -0.32 1.20" material="wood_natural"/>
+      <!-- 右门 -->
+      <geom type="box" size="0.032 0.30 1.12" pos="0.30 0.32 1.20" material="wood_natural"/>
+      <!-- 门把手 -->
+      <geom type="cylinder" size="0.017 0.065" pos="0.34 -0.48 1.20" material="metal_brushed" euler="0 90 0"/>
+      <geom type="cylinder" size="0.017 0.065" pos="0.34 0.48 1.20" material="metal_brushed" euler="0 90 0"/>
+    </body>
+
+    <!-- ========== 卧室2 (东北区域) ========== -->
+
+    <!-- 单人床（床头靠北墙） -->
+    <body name="bed2" pos="3.6 4.3 0">
+      <!-- 床架 -->
+      <geom type="box" size="0.68 1.05 0.13" pos="0 0 0.13" material="wood_walnut"/>
+      <!-- 床垫 -->
+      <geom type="box" size="0.63 1.00 0.19" pos="0 0 0.38" rgba="0.97 0.97 0.95 1"/>
+      <!-- 床单 -->
+      <geom type="box" size="0.63 1.00 0.02" pos="0 0 0.49" rgba="0.89 0.92 0.95 1"/>
+      <!-- 床头板（靠墙） -->
+      <geom type="box" size="0.68 0.09 0.58" pos="0 0.64 0.71" material="wood_walnut"/>
+      <geom type="box" size="0.63 0.13 0.48" pos="0 0.61 0.71" material="fabric_gray"/>
+      <!-- 枕头 -->
+      <geom type="box" size="0.30 0.19 0.09" pos="0 0.42 0.56" rgba="0.99 0.99 0.99 1"/>
+    </body>
+
+    <!-- 书桌（卧室2，靠东墙但不重合） -->
+    <body name="desk" pos="5.7 3.9 0">
+      <!-- 桌面 -->
+      <geom type="box" size="0.58 0.75 0.026" pos="0 0 0.75" material="wood_natural"/>
+      <!-- 桌腿 -->
+      <geom type="box" size="0.052 0.052 0.36" pos="-0.50 -0.67 0.36" material="metal_brushed"/>
+      <geom type="box" size="0.052 0.052 0.36" pos="0.50 -0.67 0.36" material="metal_brushed"/>
+      <geom type="box" size="0.052 0.052 0.36" pos="-0.50 0.67 0.36" material="metal_brushed"/>
+      <geom type="box" size="0.052 0.052 0.36" pos="0.50 0.67 0.36" material="metal_brushed"/>
+      <!-- 抽屉 -->
+      <geom type="box" size="0.48 0.65 0.13" pos="0 0 0.52" material="wood_walnut"/>
+    </body>
+
+    <!-- 书桌椅 -->
+    <body name="desk_chair" pos="5.0 3.9 0">
+      <!-- 座位 -->
+      <geom type="cylinder" size="0.25 0.052" pos="0 0 0.49" material="fabric_gray"/>
+      <!-- 靠背 -->
+      <geom type="box" size="0.23 0.065 0.27" pos="0 -0.17 0.70" material="fabric_gray"/>
+      <!-- 支撑杆 -->
+      <geom type="cylinder" size="0.032 0.23" pos="0 0 0.23" material="metal_brushed"/>
+      <!-- 底座 -->
+      <geom type="cylinder" size="0.30 0.022" pos="0 0 0.044" material="metal_brushed"/>
+    </body>
+
+    <!-- 书桌台灯 -->
+    <body name="desk_lamp" pos="5.4 3.4 0.776">
+      <!-- 底座 -->
+      <geom type="cylinder" size="0.075 0.017" pos="0 0 0" material="metal_brushed"/>
+      <!-- 灯臂 -->
+      <geom type="cylinder" size="0.013 0.16" pos="0 0.055 0.16" material="metal_brushed" euler="32 0 0"/>
+      <!-- 灯罩 -->
+      <geom type="cylinder" size="0.09 0.09" pos="0 0.17 0.30" rgba="0.99 0.97 0.91 0.87" euler="47 0 0"/>
+    </body>
+
+    <!-- 书架（卧室2） -->
+    <body name="bookshelf" pos="2.3 4.8 0">
+      <!-- 主框架 -->
+      <geom type="box" size="0.27 0.65 1.05" pos="0 0 1.05" material="wood_natural"/>
+      <!-- 隔板 -->
+      <geom type="box" size="0.25 0.63 0.022" pos="0 0 0.38" material="wood_walnut"/>
+      <geom type="box" size="0.25 0.63 0.022" pos="0 0 0.75" material="wood_walnut"/>
+      <geom type="box" size="0.25 0.63 0.022" pos="0 0 1.12" material="wood_walnut"/>
+      <geom type="box" size="0.25 0.63 0.022" pos="0 0 1.49" material="wood_walnut"/>
+      <geom type="box" size="0.25 0.63 0.022" pos="0 0 1.86" material="wood_walnut"/>
+      <!-- 书籍 -->
+      <geom type="box" size="0.19 0.032 0.19" pos="0 -0.32 0.57" rgba="0.32 0.42 0.62 1"/>
+      <geom type="box" size="0.19 0.032 0.16" pos="0 -0.22 0.555" rgba="0.62 0.32 0.32 1"/>
+      <geom type="box" size="0.19 0.032 0.21" pos="0 -0.11 0.58" rgba="0.32 0.62 0.42 1"/>
+      <geom type="box" size="0.19 0.032 0.17" pos="0 0.17 0.94" rgba="0.52 0.52 0.32 1"/>
+      <geom type="box" size="0.19 0.032 0.20" pos="0 0.32 0.945" rgba="0.42 0.32 0.52 1"/>
+    </body>
+
+    <!-- 装饰植物（卧室2角落） -->
+    <body name="plant" pos="2.4 2.4 0">
+      <!-- 花盆 -->
+      <geom type="cylinder" size="0.16 0.19" pos="0 0 0.19" rgba="0.42 0.37 0.32 1"/>
+      <!-- 植物 -->
+      <geom type="sphere" size="0.19" pos="0 0 0.51" rgba="0.27 0.57 0.32 1"/>
+      <geom type="sphere" size="0.15" pos="0.13 0.09 0.62" rgba="0.27 0.57 0.32 1"/>
+      <geom type="sphere" size="0.13" pos="-0.11 0.07 0.57" rgba="0.27 0.57 0.32 1"/>
+    </body>
+
+    <!-- ========== 窗户 ========== -->
+
+    <!-- 客厅窗户（南墙，不与墙重合） -->
+    <body name="window_living" pos="0 -5.04 1.5">
+      <!-- 玻璃 -->
+      <geom type="box" size="1.9 0.045 0.95" pos="0 0 0" material="glass_clear"/>
+      <!-- 窗框 -->
+      <geom type="box" size="1.95 0.055 0.065" pos="0 0 -0.51" material="white_matte"/>
+      <geom type="box" size="1.95 0.055 0.065" pos="0 0 0.51" material="white_matte"/>
+      <geom type="box" size="0.065 0.055 0.95" pos="-1.9 0 0" material="white_matte"/>
+      <geom type="box" size="0.065 0.055 0.95" pos="1.9 0 0" material="white_matte"/>
+      <geom type="box" size="0.065 0.055 0.95" pos="0 0 0" material="white_matte"/>
+    </body>
+
+    <!-- 卧室1窗户（北墙，不与墙重合） -->
+    <body name="window_bed1" pos="-3.2 5.04 1.5">
+      <geom type="box" size="1.3 0.045 0.85" pos="0 0 0" material="glass_clear"/>
+      <geom type="box" size="1.35 0.055 0.055" pos="0 0 -0.45" material="white_matte"/>
+      <geom type="box" size="1.35 0.055 0.055" pos="0 0 0.45" material="white_matte"/>
+      <geom type="box" size="0.055 0.055 0.85" pos="-1.3 0 0" material="white_matte"/>
+      <geom type="box" size="0.055 0.055 0.85" pos="1.3 0 0" material="white_matte"/>
+    </body>
+
+    <!-- 卧室2窗户（北墙，不与墙重合） -->
+    <body name="window_bed2" pos="3.6 5.04 1.5">
+      <geom type="box" size="1.3 0.045 0.85" pos="0 0 0" material="glass_clear"/>
+      <geom type="box" size="1.35 0.055 0.055" pos="0 0 -0.45" material="white_matte"/>
+      <geom type="box" size="1.35 0.055 0.055" pos="0 0 0.45" material="white_matte"/>
+      <geom type="box" size="0.055 0.055 0.85" pos="-1.3 0 0" material="white_matte"/>
+      <geom type="box" size="0.055 0.055 0.85" pos="1.3 0 0" material="white_matte"/>
+    </body>
+
+    <!-- ========== 装饰元素 ========== -->
+
+    <!-- 墙面装饰画（客厅） -->
+    <geom name="wall_art1" type="box" size="0.55 0.017 0.38" pos="-4.6 -5.09 1.65" rgba="0.87 0.90 0.92 1"/>
+    <geom name="wall_art1_frame" type="box" size="0.57 0.022 0.40" pos="-4.6 -5.11 1.65" material="black_matte"/>
+
+    <!-- 墙面装饰画（卧室1） -->
+    <geom name="wall_art2" type="box" size="0.43 0.017 0.32" pos="-3.2 5.09 1.75" rgba="0.92 0.87 0.82 1"/>
+    <geom name="wall_art2_frame" type="box" size="0.45 0.022 0.34" pos="-3.2 5.11 1.75" material="wood_walnut"/>
+
+    <!-- 吊灯（客厅中央） -->
+    <body name="pendant_light_living" pos="0 -1.6 2.85">
+      <geom type="cylinder" size="0.012 0.32" pos="0 0 0.32" material="metal_brushed"/>
+      <geom type="sphere" size="0.24" pos="0 0 0" rgba="0.99 0.97 0.93 0.87"/>
+    </body>
+
+    <!-- 吸顶灯（卧室1） -->
+    <body name="ceiling_light_bed1" pos="-3.2 3.6 2.97">
+      <geom type="cylinder" size="0.32 0.065" pos="0 0 0" rgba="0.99 0.97 0.93 0.92"/>
+      <geom type="cylinder" size="0.34 0.022" pos="0 0 0.065" material="metal_brushed"/>
+    </body>
+
+    <!-- 吸顶灯（卧室2） -->
+    <body name="ceiling_light_bed2" pos="3.6 3.6 2.97">
+      <geom type="cylinder" size="0.30 0.065" pos="0 0 0" rgba="0.99 0.97 0.93 0.92"/>
+      <geom type="cylinder" size="0.32 0.022" pos="0 0 0.065" material="metal_brushed"/>
+    </body>
+
+  </worldbody>
+</mujoco>
