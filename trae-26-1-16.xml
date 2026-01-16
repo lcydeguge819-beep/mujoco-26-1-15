@@ -1,0 +1,358 @@
+<mujoco model="Japanese_Zen_Home">
+  <!-- 
+    Designed by: Trae AI
+    Style: Modern Japanese (Zen)
+    Rooms: Living Room, Kitchen, Bedroom
+  -->
+
+  <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+  
+  <option timestep="0.005" gravity="0 0 -9.81" density="1.2"/>
+
+  <visual>
+    <global offwidth="1920" offheight="1080" azimuth="150" elevation="-20"/>
+    <quality shadowsize="4096"/>
+    <headlight active="0"/>
+    <map fogstart="3" fogend="10" force="0.1" znear="0.1"/>
+  </visual>
+
+  <default>
+    <geom condim="3" friction="0.7 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+  </default>
+
+  <asset>
+    <!-- Textures: Procedural generation for standalone capability -->
+    <texture name="tex_sky" type="skybox" builtin="gradient" rgb1="0.8 0.9 1.0" rgb2="0.6 0.8 0.9" width="512" height="512"/>
+    
+    <!-- Wood Texture (Light Oak) -->
+    <texture name="tex_wood_light" type="cube" builtin="flat" rgb1="0.85 0.75 0.6" width="512" height="512" mark="random" markrgb="0.8 0.7 0.55"/>
+    <material name="mat_wood_light" texture="tex_wood_light" texrepeat="1 1" reflectance="0.3" specular="0.2"/>
+
+    <!-- Wood Texture (Dark Walnut) -->
+    <texture name="tex_wood_dark" type="cube" builtin="flat" rgb1="0.4 0.3 0.25" width="512" height="512" mark="cross" markrgb="0.35 0.25 0.2"/>
+    <material name="mat_wood_dark" texture="tex_wood_dark" texrepeat="1 1" reflectance="0.2" specular="0.1"/>
+
+    <!-- Tatami Texture -->
+    <texture name="tex_tatami" type="2d" builtin="checker" rgb1="0.7 0.75 0.5" rgb2="0.65 0.7 0.45" width="512" height="512"/>
+    <material name="mat_tatami" texture="tex_tatami" texrepeat="5 5" reflectance="0.1" specular="0.0"/>
+
+    <!-- Wall Texture (Plaster) -->
+    <texture name="tex_wall" type="2d" builtin="flat" rgb1="0.95 0.94 0.92" width="512" height="512"/>
+    <material name="mat_wall" texture="tex_wall" reflectance="0.1" specular="0.05"/>
+
+    <!-- Floor Tile (Kitchen) -->
+    <texture name="tex_tile" type="2d" builtin="checker" rgb1="0.3 0.3 0.35" rgb2="0.25 0.25 0.3" width="512" height="512"/>
+    <material name="mat_tile" texture="tex_tile" texrepeat="4 4" reflectance="0.4" specular="0.5"/>
+    <texture name="tex_stone_entry" type="2d" builtin="checker" rgb1="0.4 0.4 0.4" rgb2="0.3 0.3 0.3" width="512" height="512"/>
+    <material name="mat_stone_entry" texture="tex_stone_entry" texrepeat="4 4" reflectance="0.2" specular="0.1"/>
+    
+    <!-- Shoji Paper -->
+    <material name="mat_shoji" rgba="0.95 0.95 0.95 0.9" reflectance="0.1" specular="0.1"/>
+
+    <!-- Fabric (Blue) -->
+    <material name="mat_fabric_blue" rgba="0.2 0.3 0.5 1" reflectance="0.05" specular="0.0"/>
+    
+    <!-- Fabric (White/Bed) -->
+    <material name="mat_fabric_white" rgba="0.95 0.95 0.95 1" reflectance="0.1" specular="0.0"/>
+
+    <!-- Plant Green -->
+    <material name="mat_plant" rgba="0.1 0.4 0.1 1" reflectance="0.1" specular="0.2"/>
+  </asset>
+
+  <worldbody>
+    <!-- Lighting -->
+    <light mode="targetbodycom" target="living_center" directional="true" pos="-5 -5 10" diffuse="0.9 0.85 0.8" specular="0.2 0.2 0.2" castshadow="true"/>
+    <light mode="fixed" pos="2 2 3" diffuse="0.4 0.4 0.3" attenuation="1 0 0"/>
+    <light name="top_light" mode="targetbodycom" target="living_center" directional="true" pos="0 0 8" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2" castshadow="true"/>
+    
+    <!-- ================= FLOOR PLAN ================= -->
+    <!-- Total Area approx 10m x 8m -->
+    
+    <!-- Living Room Floor (Wood) - Center -->
+    <geom name="floor_living" type="box" pos="0 0 -0.1" size="3 1.5 0.1" material="mat_wood_light"/>
+    <body name="living_center" pos="0 0 0"/>
+    <geom name="floor_entry" type="box" pos="0 -2.25 -0.1" size="3 0.75 0.1" material="mat_stone_entry"/>
+    <!-- Dining & TV Area Connection -->
+    <geom name="floor_dining" type="box" pos="-1.5 2.25 -0.1" size="1.5 0.75 0.1" material="mat_wood_dark"/>
+    <geom name="floor_center_north" type="box" pos="1.5 2.25 -0.1" size="1.5 0.75 0.1" material="mat_wood_light"/>
+
+    <!-- New Room: Bathroom Floor (North-West) -->
+    <geom name="floor_bathroom" type="box" pos="-4.25 4.5 -0.1" size="1.75 1.5 0.1" material="mat_tile"/>
+    
+    <!-- New Room: Study Floor (North-East) -->
+    <geom name="floor_study" type="box" pos="4 4.5 -0.05" size="1.5 1.5 0.15" material="mat_tatami"/>
+
+    <!-- Tearoom (Small raised area) -->
+    <geom name="floor_tearoom" type="box" pos="4 2.25 -0.05" size="1.5 0.75 0.15" material="mat_tatami"/>
+    
+    <!-- Kitchen Floor (Tile) - Extended Left -->
+    <!-- Original: pos="-4 0 -0.1" size="1.5 3 0.1" (Range: -5.5 to -2.5) -->
+    <!-- New: Extend left by 0.5m. New Left Edge: -6.0. Range: -6.0 to -2.5. Width: 3.5. Center: -4.25. Size: 1.75 -->
+    <geom name="floor_kitchen" type="box" pos="-4.25 0 -0.1" size="1.75 3 0.1" material="mat_tile"/>
+    
+    <!-- Corridor (Veranda/Engawa) - Shifted Left and Lowered -->
+    <!-- Left edge of kitchen is now -6.0. Corridor starts there. -->
+    <!-- Width 0.5m. Center: -6.0 - 0.25 = -6.25. -->
+    <!-- Lowered height: Kitchen top is 0. Corridor top should be slightly lower, say -0.05. -->
+    <!-- Box height 0.05. Center Z = -0.05 - 0.05 = -0.1. Top surface at -0.05. -->
+    <geom name="floor_corridor" type="box" pos="-6.25 0 -0.1" size="0.25 3 0.05" material="mat_wood_dark"/>
+    <!-- Base under corridor (Ground) -->
+    <!-- To fill the gap below the corridor to the ground level or create a step effect. -->
+    <geom name="floor_corridor_base" type="box" pos="-6.25 0 -0.2" size="0.25 3 0.05" material="mat_stone_entry"/>
+    
+    <!-- Courtyard Floor - Shifted Left -->
+    <!-- Start at corridor edge -6.5. -->
+    <!-- Pos: -8.0, Size: 1.5 (Width 3.0, Range -6.5 to -9.5) -->
+    <geom name="floor_courtyard" type="box" pos="-8.0 0 -0.15" size="1.5 3 0.1" material="mat_stone_entry"/>
+
+    <!-- Bedroom Floor (Tatami Platform) - Right side, slightly raised -->
+    <geom name="floor_bedroom" type="box" pos="3.5 0 -0.05" size="2 3 0.15" material="mat_tatami"/>
+    <!-- Bedroom Step -->
+    <geom name="bedroom_step" type="box" pos="1.5 0 -0.05" size="0.2 3 0.15" material="mat_wood_dark"/>
+
+
+    <!-- ================= WALLS ================= -->
+    <!-- Back Wall (Center Segment behind TV) -->
+    <!-- This creates openings at the sides for the Bathroom (Left) and Study (Right) -->
+    <geom name="wall_back_center" type="box" pos="0 3 1.5" size="2.5 0.1 1.5" material="mat_wall"/>
+    
+    <!-- Bathroom Walls (North-West Room) -->
+    <geom name="wall_bath_back" type="box" pos="-4.25 6 1.5" size="1.75 0.1 1.5" material="mat_wall"/>
+    <!-- Adjusted Left Wall position to match extended Kitchen -->
+    <geom name="wall_bath_left" type="box" pos="-6.0 4.5 1.5" size="0.1 1.5 1.5" material="mat_wall"/>
+    <geom name="wall_bath_right" type="box" pos="-2.5 4.5 1.5" size="0.1 1.5 1.5" material="mat_wall"/>
+
+    <!-- Study Walls (North-East Room) -->
+    <geom name="wall_study_back" type="box" pos="4 6 1.5" size="1.5 0.1 1.5" material="mat_wall"/>
+    <geom name="wall_study_right" type="box" pos="5.5 4.5 1.5" size="0.1 1.5 1.5" material="mat_wall"/>
+    <geom name="wall_study_left" type="box" pos="2.5 4.5 1.5" size="0.1 1.5 1.5" material="mat_wall"/>
+
+    <!-- Front Wall (with opening for view) -->
+    <geom name="wall_front_left" type="box" pos="-4.25 -3 1.5" size="1.75 0.1 1.5" material="mat_wall"/>
+    <geom name="wall_front_right" type="box" pos="4 -3 1.5" size="1.5 0.1 1.5" material="mat_wall"/>
+    <!-- Left Wall - Shifted Left -->
+    <geom name="wall_left_south" type="box" pos="-6.0 -2 1.5" size="0.1 1.1 1.5" material="mat_wall"/>
+    <geom name="wall_left_north" type="box" pos="-6.0 2 1.5" size="0.1 1.1 1.5" material="mat_wall"/>
+    <!-- Right Wall -->
+    <geom name="wall_right" type="box" pos="5.5 0 1.5" size="0.1 3.1 1.5" material="mat_wall"/>
+    <!-- Courtyard Walls - Adjusted -->
+    <geom name="wall_courtyard_back" type="box" pos="-8.0 3.1 1.0" size="1.5 0.1 1.0" material="mat_wood_dark"/>
+    <geom name="wall_courtyard_front" type="box" pos="-8.0 -3.1 1.0" size="1.5 0.1 1.0" material="mat_wood_dark"/>
+    <geom name="wall_courtyard_left" type="box" pos="-9.5 0 1.0" size="0.1 3.1 1.0" material="mat_wood_dark"/>
+
+    <!-- Doorways / Openings -->
+    <!-- Openings to Bathroom and Study are created by the gap between wall_back_center and the side walls -->
+
+    <!-- ================= PARTITIONS ================= -->
+    
+    <!-- Shoji Screen (Divider between Living and Bedroom) -->
+    <!-- Frame -->
+    <body name="shoji_divider" pos="1.5 0 0">
+        <!-- Top Track -->
+        <geom type="box" pos="0 0 2.8" size="0.05 3 0.1" material="mat_wood_dark"/>
+        <!-- Bottom Track -->
+        <geom type="box" pos="0 0 0.05" size="0.05 3 0.05" material="mat_wood_dark"/>
+        
+        <!-- Sliding Door 1 (Fixed for visual) -->
+        <body name="shoji_door_1" pos="0 -0.75 1.4">
+            <geom type="box" size="0.02 0.75 1.4" material="mat_shoji"/>
+            <geom type="box" size="0.03 0.75 0.05" pos="0 0 1.35" material="mat_wood_light"/> <!-- Top frame -->
+            <geom type="box" size="0.03 0.75 0.05" pos="0 0 -1.35" material="mat_wood_light"/> <!-- Bottom frame -->
+            <geom type="box" size="0.03 0.05 1.4" pos="0 0.7 0" material="mat_wood_light"/> <!-- Side frame -->
+            <geom type="box" size="0.03 0.05 1.4" pos="0 -0.7 0" material="mat_wood_light"/> <!-- Side frame -->
+            <!-- Grid lines -->
+            <geom type="box" size="0.025 0.75 0.02" pos="0 0 0.5" material="mat_wood_light"/>
+            <geom type="box" size="0.025 0.75 0.02" pos="0 0 -0.5" material="mat_wood_light"/>
+            <geom type="box" size="0.025 0.02 1.4" pos="0 0 0" material="mat_wood_light"/>
+        </body>
+
+        <!-- Sliding Door 2 (Open) -->
+        <body name="shoji_door_2" pos="0.05 0.7 1.4">
+            <geom type="box" size="0.02 0.75 1.4" material="mat_shoji"/>
+             <geom type="box" size="0.03 0.75 0.05" pos="0 0 1.35" material="mat_wood_light"/>
+            <geom type="box" size="0.03 0.75 0.05" pos="0 0 -1.35" material="mat_wood_light"/>
+            <geom type="box" size="0.03 0.05 1.4" pos="0 0.7 0" material="mat_wood_light"/>
+            <geom type="box" size="0.03 0.05 1.4" pos="0 -0.7 0" material="mat_wood_light"/>
+            <!-- Grid lines -->
+            <geom type="box" size="0.025 0.75 0.02" pos="0 0 0.5" material="mat_wood_light"/>
+            <geom type="box" size="0.025 0.75 0.02" pos="0 0 -0.5" material="mat_wood_light"/>
+            <geom type="box" size="0.025 0.02 1.4" pos="0 0 0" material="mat_wood_light"/>
+        </body>
+    </body>
+
+    <!-- Kitchen Divider (Vertical Slats) -->
+    <body name="kitchen_divider" pos="-2.5 1.5 0">
+        <geom type="box" pos="0 0 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+        <geom type="box" pos="0 0.4 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+        <geom type="box" pos="0 0.8 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+        <geom type="box" pos="0 1.2 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+    </body>
+
+    <!-- ================= FURNITURE: LIVING ROOM ================= -->
+    
+    <!-- Chabudai (Low Table) -->
+    <body name="table" pos="0 0 0.2">
+        <!-- Table Top -->
+        <geom type="cylinder" size="0.6 0.03" material="mat_wood_dark"/>
+        <!-- Legs -->
+        <geom type="box" pos="0.3 0.3 -0.1" size="0.04 0.04 0.1" material="mat_wood_dark"/>
+        <geom type="box" pos="-0.3 0.3 -0.1" size="0.04 0.04 0.1" material="mat_wood_dark"/>
+        <geom type="box" pos="0.3 -0.3 -0.1" size="0.04 0.04 0.1" material="mat_wood_dark"/>
+        <geom type="box" pos="-0.3 -0.3 -0.1" size="0.04 0.04 0.1" material="mat_wood_dark"/>
+    </body>
+
+    <!-- Zabuton (Cushions) -->
+    <body name="cushion_1" pos="0.8 0 0.05">
+        <geom type="box" size="0.25 0.25 0.05" material="mat_fabric_blue" rgba="0.2 0.3 0.5 1"/>
+    </body>
+    <body name="cushion_2" pos="-0.8 0 0.05">
+        <geom type="box" size="0.25 0.25 0.05" material="mat_fabric_blue" rgba="0.2 0.3 0.5 1"/>
+    </body>
+
+    <!-- TV Stand / Low Cabinet -->
+    <body name="cabinet" pos="0 2.5 0.25">
+        <geom type="box" size="1.2 0.25 0.25" material="mat_wood_light"/>
+        <geom type="box" pos="0 0.26 0" size="1.2 0.01 0.25" material="mat_wood_dark"/> <!-- Top surface -->
+        
+        <!-- TV (Black box) -->
+        <geom type="box" pos="0 0 0.6" size="0.8 0.05 0.45" rgba="0.1 0.1 0.1 1" material="mat_wood_dark"/>
+    </body>
+    
+    <body name="plant" pos="-2 2.5 0.3">
+        <geom type="cylinder" size="0.15 0.15" rgba="0.6 0.3 0.1 1"/>
+        <geom type="capsule" fromto="0 0 0.1 0 0 0.6" size="0.03" material="mat_wood_dark"/>
+        <geom type="ellipsoid" pos="0 0 0.6" size="0.3 0.3 0.15" material="mat_plant"/>
+    </body>
+    <body name="courtyard_tree" pos="-8.5 1.5 0.3">
+        <geom type="cylinder" size="0.2 0.4" material="mat_wood_dark"/>
+        <geom type="ellipsoid" pos="0 0 0.8" size="0.6 0.6 0.4" material="mat_plant"/>
+    </body>
+    <body name="courtyard_rock_1" pos="-8.0 -1.5 0.1">
+        <geom type="ellipsoid" size="0.4 0.3 0.2" material="mat_stone_entry"/>
+    </body>
+    <body name="courtyard_rock_2" pos="-9.0 -0.5 0.1">
+        <geom type="ellipsoid" size="0.3 0.25 0.2" material="mat_stone_entry"/>
+    </body>
+    
+    <!-- Courtyard Furniture -->
+    <body name="courtyard_table" pos="-8.0 0 0.2">
+        <!-- Simple Stone/Wood Table -->
+        <geom type="cylinder" size="0.4 0.2" material="mat_wood_light"/>
+    </body>
+    
+    <!-- Interactive Block (with free joint) -->
+    <body name="toy_block" pos="-8.0 0 0.5">
+        <freejoint/>
+        <geom type="box" size="0.1 0.1 0.1" rgba="0.9 0.2 0.2 1" mass="1"/>
+    </body>
+    
+    <body name="entry_cabinet" pos="0 -2.5 0.25">
+        <geom type="box" size="0.8 0.2 0.25" material="mat_wood_dark"/>
+    </body>
+
+    <body name="dining_table" pos="-1.5 2.25 0.25">
+        <geom type="box" size="0.6 0.4 0.05" material="mat_wood_light"/>
+        <geom type="box" pos="0.45 0.3 -0.2" size="0.05 0.05 0.2" material="mat_wood_dark"/>
+        <geom type="box" pos="-0.45 0.3 -0.2" size="0.05 0.05 0.2" material="mat_wood_dark"/>
+    </body>
+
+    <body name="tearoom_table" pos="4 2.25 0.25">
+        <geom type="cylinder" size="0.4 0.03" material="mat_wood_dark"/>
+    </body>
+
+    <body name="tearoom_cushion" pos="4.7 2.25 0.07">
+        <geom type="box" size="0.25 0.25 0.05" material="mat_fabric_blue"/>
+    </body>
+    
+
+    <!-- ================= FURNITURE: KITCHEN ================= -->
+    <body name="kitchen_counter" pos="-4.5 0 0.45">
+        <!-- Main Counter -->
+        <geom type="box" size="0.5 2.5 0.45" material="mat_wood_light"/>
+        <!-- Countertop (Black Granite style) -->
+        <geom type="box" pos="0 0 0.46" size="0.55 2.55 0.02" rgba="0.1 0.1 0.1 1" material="mat_tile"/>
+        
+        <!-- Sink (Hollow approximation) -->
+        <geom type="box" pos="0 0 0.48" size="0.3 0.4 0.01" rgba="0.8 0.8 0.8 1"/> 
+        
+        <!-- Faucet -->
+        <geom type="capsule" fromto="0.2 0 0.5 0.2 0 0.8" size="0.02" rgba="0.7 0.7 0.7 1"/>
+        <geom type="capsule" fromto="0.2 0 0.8 0 0 0.75" size="0.02" rgba="0.7 0.7 0.7 1"/>
+    </body>
+    
+    <body name="fridge" pos="-4 -2.5 0.9">
+        <geom type="box" size="0.4 0.4 0.9" rgba="0.9 0.9 0.95 1" material="mat_wall"/>
+    </body>
+
+
+    <!-- ================= FURNITURE: BEDROOM ================= -->
+    <body name="futon_bed" pos="4 0 0.15">
+        <!-- Mattress -->
+        <geom type="box" size="1.0 1.4 0.08" material="mat_fabric_white"/>
+        <!-- Pillow -->
+        <geom type="capsule" fromto="-0.6 1.1 0.08 0.6 1.1 0.08" size="0.1" material="mat_fabric_white"/>
+        <!-- Blanket (Folded at end) -->
+        <geom type="box" pos="0 -1.0 0.09" size="1.0 0.4 0.02" material="mat_fabric_blue"/>
+    </body>
+
+    <body name="bedroom_lamp" pos="5 2 0.3">
+         <!-- Stand -->
+         <geom type="box" size="0.15 0.15 0.3" material="mat_wood_light"/>
+         <!-- Paper shade -->
+         <geom type="box" pos="0 0 0.2" size="0.12 0.12 0.25" material="mat_shoji"/>
+         <!-- Light source inside lamp -->
+         <light mode="fixed" pos="0 0 0" diffuse="0.8 0.7 0.4" attenuation="2 0 0"/>
+    </body>
+
+    <!-- ================= FURNITURE: BATHROOM ================= -->
+    <body name="bathtub" pos="-4.5 5.25 0.3">
+        <!-- Japanese Cypress Bath (Hinoki) -->
+        <geom type="box" size="0.6 0.4 0.3" material="mat_wood_light"/>
+        <geom type="box" pos="0 0 0.25" size="0.5 0.3 0.06" rgba="0.6 0.8 0.9 0.8"/> <!-- Water -->
+    </body>
+    <body name="bath_stool" pos="-3.5 4.5 0.15">
+        <geom type="cylinder" size="0.15 0.15" material="mat_wood_light"/>
+    </body>
+    <body name="towel_rack" pos="-5.7 5.2 1.0">
+        <geom type="box" pos="0 0 0.6" size="0.03 0.03 0.6" material="mat_wood_dark"/>
+        <geom type="box" pos="0.5 0 0.6" size="0.03 0.03 0.6" material="mat_wood_dark"/>
+        <geom type="capsule" fromto="0.05 0 1.2 0.45 0 1.2" size="0.02" rgba="0.8 0.8 0.8 1"/>
+        <geom type="box" pos="0.25 0 1.05" size="0.25 0.02 0.15" material="mat_fabric_white"/>
+    </body>
+    <body name="toilet" pos="-3.2 5.0 0.2">
+        <geom type="ellipsoid" size="0.3 0.22 0.25" rgba="0.95 0.95 0.95 1"/>
+        <geom type="box" pos="-0.25 0 0.45" size="0.18 0.08 0.25" rgba="0.95 0.95 0.95 1"/>
+        <geom type="box" pos="-0.25 0 0.7" size="0.18 0.02 0.04" rgba="0.95 0.95 0.95 1"/>
+    </body>
+    <body name="bath_kitchen_partition" pos="-4.25 3.0 0">
+        <geom type="box" pos="-0.85 0 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+        <geom type="box" pos="0.85 0 1.5" size="0.05 0.05 1.5" material="mat_wood_dark"/>
+        <geom type="box" pos="0 0 3.0" size="0.9 0.05 0.1" material="mat_wood_dark"/>
+        <geom type="box" pos="0 0 0.05" size="0.9 0.05 0.05" material="mat_wood_dark"/>
+        <body name="bath_glass_door" pos="-0.6 0 0">
+            <joint type="slide" axis="1 0 0" range="0 1.2" limited="true" damping="1"/>
+            <geom type="box" pos="0 0 1.4" size="0.75 0.02 1.4" rgba="0.8 0.9 1 0.3"/>
+        </body>
+    </body>
+
+    <!-- ================= FURNITURE: STUDY ================= -->
+    <body name="study_desk" pos="4 5.5 0.35">
+        <geom type="box" size="0.8 0.3 0.02" material="mat_wood_dark"/> <!-- Desktop -->
+        <geom type="box" pos="-0.7 0 -0.17" size="0.05 0.3 0.17" material="mat_wood_dark"/> <!-- Leg L -->
+        <geom type="box" pos="0.7 0 -0.17" size="0.05 0.3 0.17" material="mat_wood_dark"/> <!-- Leg R -->
+    </body>
+    <body name="study_chair" pos="4 4.8 0.25">
+        <geom type="box" size="0.25 0.25 0.02" material="mat_wood_dark"/> <!-- Seat -->
+        <geom type="box" pos="0 0.23 0.25" size="0.25 0.02 0.25" material="mat_wood_dark"/> <!-- Back -->
+        <geom type="box" pos="-0.2 0 -0.12" size="0.02 0.2 0.12" material="mat_wood_dark"/> <!-- Legs -->
+        <geom type="box" pos="0.2 0 -0.12" size="0.02 0.2 0.12" material="mat_wood_dark"/>
+    </body>
+    <body name="bookshelf" pos="5.2 4.5 0.75">
+        <geom type="box" size="0.15 0.4 0.75" material="mat_wood_light"/>
+        <!-- Books (Abstract) -->
+        <geom type="box" pos="-0.05 0 0.2" size="0.08 0.35 0.1" rgba="0.8 0.2 0.2 1"/>
+        <geom type="box" pos="-0.05 0 -0.2" size="0.08 0.35 0.1" rgba="0.2 0.2 0.8 1"/>
+    </body>
+
+  </worldbody>
+</mujoco>
