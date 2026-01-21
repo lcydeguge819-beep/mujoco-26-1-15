@@ -1,0 +1,516 @@
+<mujoco model="Japanese_320m2_Home">
+  <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+  <option timestep="0.005" gravity="0 0 -9.81" density="1.2"/>
+
+  <visual>
+    <global offwidth="1920" offheight="1080" azimuth="140" elevation="-20"/>
+    <quality shadowsize="4096"/>
+    <map fogstart="25" fogend="40" znear="0.1"/>
+  </visual>
+
+  <default>
+    <geom condim="3" friction="0.8 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    <joint damping="1"/>
+  </default>
+
+  <asset>
+    <texture name="tex_sky" type="skybox" builtin="gradient" rgb1="0.8 0.9 1.0" rgb2="0.6 0.8 0.9" width="512" height="512"/>
+
+    <texture name="tex_floor_wood" type="2d" builtin="checker" rgb1="0.75 0.65 0.55" rgb2="0.7 0.6 0.5" width="512" height="512"/>
+    <material name="mat_floor_wood" texture="tex_floor_wood" texrepeat="6 8" reflectance="0.2" specular="0.2"/>
+
+    <texture name="tex_tatami" type="2d" builtin="checker" rgb1="0.78 0.8 0.6" rgb2="0.74 0.77 0.58" width="512" height="512"/>
+    <material name="mat_tatami" texture="tex_tatami" texrepeat="8 8" reflectance="0.05" specular="0.05"/>
+
+    <texture name="tex_tile" type="2d" builtin="checker" rgb1="0.4 0.4 0.45" rgb2="0.35 0.35 0.4" width="512" height="512"/>
+    <material name="mat_tile" texture="tex_tile" texrepeat="8 8" reflectance="0.3" specular="0.3"/>
+
+    <texture name="tex_wall" type="2d" builtin="flat" rgb1="0.96 0.95 0.94" width="512" height="512"/>
+    <material name="mat_wall" texture="tex_wall" reflectance="0.1" specular="0.05"/>
+
+    <material name="mat_wood_dark" rgba="0.35 0.25 0.18 1" reflectance="0.15" specular="0.2"/>
+    <material name="mat_glass" rgba="0.8 0.9 1 0.3" reflectance="0.2" specular="0.4"/>
+    <material name="mat_metal" rgba="0.7 0.7 0.75 1" reflectance="0.3" specular="0.5"/>
+    <material name="mat_fabric" rgba="0.8 0.85 0.9 1" reflectance="0.05" specular="0.02"/>
+    <material name="mat_stone" rgba="0.5 0.5 0.5 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_plant" rgba="0.1 0.4 0.15 1" reflectance="0.1" specular="0.15"/>
+    <material name="mat_pot" rgba="0.6 0.3 0.1 1" reflectance="0.1" specular="0.1"/> <!-- Terracotta -->
+    <material name="mat_flower_red" rgba="0.9 0.1 0.1 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_flower_yellow" rgba="0.9 0.8 0.1 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_flower_purple" rgba="0.6 0.2 0.8 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_cardboard" rgba="0.6 0.5 0.4 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_tool_handle" rgba="0.8 0.1 0.1 1" reflectance="0.2" specular="0.2"/>
+    <material name="mat_book_red" rgba="0.7 0.2 0.2 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_book_blue" rgba="0.2 0.3 0.7 1" reflectance="0.1" specular="0.1"/>
+    <material name="mat_book_green" rgba="0.2 0.6 0.3 1" reflectance="0.1" specular="0.1"/>
+    
+    <material name="mat_ceramic" rgba="0.9 0.9 0.95 1" reflectance="0.5" specular="0.5"/>
+    <material name="mat_mirror" rgba="0.9 0.9 1 1" reflectance="0.95" specular="0.8"/>
+
+    <!-- TV Screen Material -->
+    <texture name="tex_screen" type="2d" builtin="flat" rgb1="0 0 0" width="800" height="450"/>
+    <material name="mat_screen" texture="tex_screen" reflectance="0.1" specular="0.5"/>
+  </asset>
+
+  <worldbody>
+    <light name="main_sun" directional="true" pos="-20 -15 30" dir="0.4 0.3 -1" diffuse="0.9 0.85 0.8" specular="0.3 0.3 0.3"/>
+    <light name="fill_light" directional="true" pos="15 20 15" dir="-0.5 -0.5 -1" diffuse="0.4 0.4 0.45" specular="0.1 0.1 0.1"/>
+    
+    <!-- Perimeter walls -->
+    <geom name="wall_north" type="box" pos="0 10 1.25" size="8 0.05 1.25" material="mat_wall"/>
+    <geom name="wall_west"  type="box" pos="-8 0 1.25" size="0.05 10 1.25" material="mat_wall"/>
+    
+    <!-- Segmented East Wall (No Overlaps) -->
+    <geom name="wall_east_living" type="box" pos="8 -4.25 1.25" size="0.05 5.75 1.25" material="mat_wall"/>
+    <geom name="wall_east_master" type="box" pos="8 3.5 1.25" size="0.05 2 1.25" material="mat_wall"/>
+    <geom name="wall_east_ne"     type="box" pos="8 7.75 1.25" size="0.05 2.25 1.25" material="mat_wall"/>
+
+    <!-- ZONES (No Overlaps) -->
+    <!-- South Living: Y -10 to 1.5 -->
+    <geom name="zone_living_main" type="box" pos="0 -4.25 -0.049" size="8 5.75 0.001" material="mat_floor_wood"/>
+    
+    <!-- Central Block: Y 1.5 to 5.5 -->
+    <!-- Kitchen (West): X -8 to -3 -->
+    <geom name="zone_kitchen" type="box" pos="-5.5 3.5 -0.049" size="2.5 2 0.001" material="mat_tile"/>
+    <!-- Dining/Hall (Center): X -3 to 3 -->
+    <geom name="zone_dining" type="box" pos="0 3.5 -0.049" size="3 2 0.001" material="mat_floor_wood"/>
+    <!-- Master Bedroom (East): X 3 to 8 -->
+    <geom name="zone_bedroom_master" type="box" pos="5.5 3.5 -0.03" size="2.5 2 0.03" material="mat_tatami"/>
+
+    <!-- North Block: Y 5.5 to 10 -->
+    <!-- Bathroom (North West): X -8 to -3 -->
+    <geom name="zone_bathroom" type="box" pos="-5.5 7.75 -0.049" size="2.5 2.25 0.001" material="mat_tile"/>
+    <!-- North Center Room: X -3 to 3 -->
+    <geom name="zone_room_north" type="box" pos="0 7.75 -0.049" size="3 2.25 0.001" material="mat_floor_wood"/>
+    <!-- North East Room: X 3 to 8 -->
+    <geom name="zone_bedroom_east" type="box" pos="5.5 7.75 -0.03" size="2.5 2.25 0.03" material="mat_tatami"/>
+
+    <!-- Genkan (Entrance): In South Left corner -->
+    <geom name="zone_genkan" type="box" pos="-5.5 -8.5 -0.08" size="2.5 1.5 0.03" material="mat_stone"/>
+    
+    <!-- Partition Wall (Genkan / Kitchen) -->
+    <geom name="wall_genkan_kitchen" type="box" pos="-5.5 -6 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+
+    <!-- New External Courtyard (Removed) -->
+    <!-- <geom name="floor_courtyard_ext" ... /> -->
+
+
+    <!-- INTERNAL PARTITIONS & WALLS (Trimmed) -->
+    
+    <!-- 1. Divider between South Living and Central Block (Y=1.5) -->
+    <!-- Left (South of Kitchen) -->
+    <geom name="wall_south_kitchen" type="box" pos="-5.5 1.5 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+    <!-- Right (South of Master) -->
+    <geom name="wall_south_master" type="box" pos="5.5 1.5 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+    <!-- Center (Open or Partial?) Let's leave open for now -->
+
+    <!-- 2. Divider between Central Block and North Block (Y=5.5) -->
+    <!-- Left (Between Kitchen and Bathroom) -->
+    <geom name="wall_kitchen_bath" type="box" pos="-5.5 5.5 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+    <!-- Right (Between Master and NE Room) -->
+    <geom name="wall_master_ne" type="box" pos="5.5 5.5 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+
+    <!-- 3. Vertical Dividers (X=-3 and X=3) -->
+    
+    <!-- West Divider (Kitchen/Bath Wall) -->
+    <!-- Segment 1: Kitchen East Wall (with Door Gap) -->
+    <geom name="wall_kitchen_east_1" type="box" pos="-3 2 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <geom name="wall_kitchen_east_2" type="box" pos="-3 5 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <!-- Door Header -->
+    <geom name="wall_kitchen_east_header" type="box" pos="-3 3.5 2.25" size="0.05 1 0.25" material="mat_wall"/>
+
+    <!-- Segment 2: Bathroom East Wall (with Glass Door Gap) -->
+    <geom name="wall_bath_east_1" type="box" pos="-3 6 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <geom name="wall_bath_east_2" type="box" pos="-3 9.25 1.25" size="0.05 0.75 1.25" material="mat_wall"/>
+    <!-- Door Header -->
+    <geom name="wall_bath_east_header" type="box" pos="-3 7.5 2.25" size="0.05 1 0.25" material="mat_wall"/>
+
+    <!-- East Divider (Master/NE Room Wall) -->
+    <!-- Segment 1: Master West Wall (with Door Gap) -->
+    <geom name="wall_master_west_1" type="box" pos="3 2 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <geom name="wall_master_west_2" type="box" pos="3 5 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <!-- Door Header -->
+    <geom name="wall_master_west_header" type="box" pos="3 3.5 2.25" size="0.05 1 0.25" material="mat_wall"/>
+
+    <!-- Segment 2: NE Room West Wall (Solid or Door?) Let's put a door too -->
+    <geom name="wall_ne_west_1" type="box" pos="3 6 1.25" size="0.05 0.5 1.25" material="mat_wall"/>
+    <geom name="wall_ne_west_2" type="box" pos="3 9.25 1.25" size="0.05 0.75 1.25" material="mat_wall"/>
+    <geom name="wall_ne_west_header" type="box" pos="3 7.5 2.25" size="0.05 1 0.25" material="mat_wall"/>
+
+
+    <!-- South Wall Openings -->
+    <geom name="wall_south_left"  type="box" pos="-5.5 -10 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+    <geom name="wall_south_right" type="box" pos="5.5 -10 1.25" size="2.5 0.05 1.25" material="mat_wall"/>
+
+
+    <!-- DOORS -->
+    
+    <!-- Kitchen Door (Hinge) -->
+    <body name="door_kitchen" pos="-3 3.5 1">
+      <joint name="joint_door_kitchen" type="hinge" axis="0 0 1" range="-90 90"/>
+      <geom type="box" pos="0.6 0 0" size="0.6 0.04 1" material="mat_wood_dark"/>
+      <!-- Handle -->
+      <geom type="sphere" pos="1.1 0.08 0" size="0.05" material="mat_metal"/>
+    </body>
+
+    <!-- Master Bedroom Door (Hinge) -->
+    <body name="door_master" pos="3 3.5 1">
+      <joint name="joint_door_master" type="hinge" axis="0 0 1" range="-90 90"/>
+      <geom type="box" pos="-0.6 0 0" size="0.6 0.04 1" material="mat_wood_dark"/> <!-- Opens Inward/Left -->
+      <geom type="sphere" pos="-1.1 -0.08 0" size="0.05" material="mat_metal"/>
+    </body>
+
+    <!-- Bathroom Door (Glass, Hinge) -->
+    <body name="door_bathroom" pos="-3 7.5 1">
+      <joint name="joint_door_bathroom" type="hinge" axis="0 0 1" range="-90 90"/>
+      <geom type="box" pos="0.6 0 0" size="0.6 0.02 1" material="mat_glass"/>
+      <geom type="box" pos="0.6 0 0" size="0.55 0.025 0.95" rgba="1 1 1 0.1"/> <!-- Frame effect -->
+      <geom type="cylinder" pos="1.1 0.06 0" size="0.03 0.1" material="mat_metal"/> <!-- Handle -->
+    </body>
+
+    <!-- Storage Room (Relocated to West Middle Zone - Tile Floor) -->
+    <!-- Bookcases (North Wall of this zone: Y approx 5.3) -->
+    <body name="storage_bookcase_1" pos="-6.5 5.2 0.9">
+      <geom type="box" size="0.6 0.2 0.9" material="mat_wood_dark"/>
+      <!-- Books Row 1 -->
+      <geom type="box" pos="-0.4 -0.15 0.7" size="0.05 0.18 0.12" material="mat_book_red"/>
+      <geom type="box" pos="-0.25 -0.15 0.7" size="0.05 0.18 0.11" material="mat_book_blue"/>
+      <geom type="box" pos="-0.1 -0.15 0.7" size="0.05 0.18 0.13" material="mat_book_green"/>
+      <geom type="box" pos="0.1 -0.15 0.7" size="0.05 0.18 0.12" material="mat_book_red"/>
+      <geom type="box" pos="0.3 -0.15 0.7" size="0.05 0.18 0.11" material="mat_book_blue"/>
+      <!-- Books Row 2 -->
+      <geom type="box" pos="-0.35 -0.15 0.3" size="0.05 0.18 0.12" material="mat_book_green"/>
+      <geom type="box" pos="-0.15 -0.15 0.3" size="0.05 0.18 0.11" material="mat_book_red"/>
+      <geom type="box" pos="0.1 -0.15 0.3" size="0.05 0.18 0.13" material="mat_book_blue"/>
+      <geom type="box" pos="0.35 -0.15 0.3" size="0.05 0.18 0.12" material="mat_book_green"/>
+    </body>
+    <body name="storage_bookcase_2" pos="-5.0 5.2 0.9">
+      <geom type="box" size="0.6 0.2 0.9" material="mat_wood_dark"/>
+      <!-- Books Row 1 -->
+      <geom type="box" pos="-0.4 -0.15 0.6" size="0.05 0.18 0.12" material="mat_book_blue"/>
+      <geom type="box" pos="-0.1 -0.15 0.6" size="0.05 0.18 0.13" material="mat_book_green"/>
+      <geom type="box" pos="0.2 -0.15 0.6" size="0.05 0.18 0.12" material="mat_book_red"/>
+       <!-- Books Row 2 -->
+      <geom type="box" pos="-0.3 -0.15 0.2" size="0.05 0.18 0.11" material="mat_book_red"/>
+      <geom type="box" pos="0 -0.15 0.2" size="0.05 0.18 0.12" material="mat_book_blue"/>
+      <geom type="box" pos="0.3 -0.15 0.2" size="0.05 0.18 0.13" material="mat_book_green"/>
+    </body>
+
+    <!-- Wall Shelves & Tools (West Wall of this zone: X approx -7.8) -->
+    <body name="storage_shelf_upper" pos="-7.8 3.5 1.6">
+      <geom type="box" size="0.15 0.8 0.02" material="mat_wood_dark"/>
+      <!-- Hanging Hammer -->
+      <body name="tool_hammer" pos="0.1 0.3 -0.2">
+         <geom type="cylinder" size="0.02 0.15" material="mat_tool_handle" euler="0 0 0"/> <!-- Handle -->
+         <geom type="box" pos="0 0 0.15" size="0.08 0.03 0.03" material="mat_metal"/> <!-- Head -->
+      </body>
+      <!-- Hanging Wrench -->
+      <body name="tool_wrench" pos="0.1 -0.3 -0.2">
+         <geom type="cylinder" size="0.015 0.12" material="mat_metal"/>
+         <geom type="cylinder" pos="0 0 -0.12" size="0.03 0.01" material="mat_metal" euler="90 0 0"/>
+      </body>
+    </body>
+    <body name="storage_shelf_lower" pos="-7.8 3.5 1.2">
+      <geom type="box" size="0.15 0.8 0.02" material="mat_wood_dark"/>
+      <!-- Hanging Screwdriver -->
+      <body name="tool_screwdriver" pos="0.1 0 -0.2">
+         <geom type="cylinder" size="0.02 0.08" material="mat_tool_handle"/> <!-- Handle -->
+         <geom type="cylinder" pos="0 0 -0.1" size="0.005 0.1" material="mat_metal"/> <!-- Shaft -->
+      </body>
+    </body>
+
+    <!-- Stacked Cardboard Boxes (SE Corner of this zone: X approx -3.5, Y approx 2.0) -->
+    <body name="box_stack" pos="-4.0 2.0 0.3">
+      <geom type="box" size="0.25 0.25 0.25" material="mat_cardboard" mass="5"/>
+      <geom type="box" pos="0.05 0 0.5" size="0.2 0.2 0.2" material="mat_cardboard" mass="3" euler="0 0 10"/>
+      <geom type="box" pos="-0.05 0.05 0.85" size="0.15 0.15 0.15" material="mat_cardboard" mass="1" euler="0 0 -5"/>
+      <geom type="box" pos="0.6 0.1 -0.1" size="0.2 0.2 0.15" material="mat_cardboard" mass="2"/>
+    </body>
+
+    <!-- NE Room Door (Hinge) -->
+    <body name="door_ne" pos="3 7.5 1">
+      <joint name="joint_door_ne" type="hinge" axis="0 0 1" range="-90 90"/>
+      <geom type="box" pos="-0.6 0 0" size="0.6 0.04 1" material="mat_wood_dark"/>
+      <geom type="sphere" pos="-1.1 -0.08 0" size="0.05" material="mat_metal"/>
+    </body>
+
+
+    <!-- FURNITURE (Adjusted Positions) -->
+    
+    <!-- Living Room Center (Moved towards TV) -->
+    <body name="chabudai" pos="3.5 -2.5 0.2">
+      <geom type="cylinder" size="0.9 0.04" material="mat_wood_dark"/>
+      <geom type="box" pos="0.7 0.7 -0.14" size="0.06 0.06 0.14" material="mat_wood_dark"/>
+      <geom type="box" pos="-0.7 0.7 -0.14" size="0.06 0.06 0.14" material="mat_wood_dark"/>
+      <geom type="box" pos="0.7 -0.7 -0.14" size="0.06 0.06 0.14" material="mat_wood_dark"/>
+      <geom type="box" pos="-0.7 -0.7 -0.14" size="0.06 0.06 0.14" material="mat_wood_dark"/>
+    </body>
+
+    <body name="vase_chabudai" pos="3.5 -2.5 0.32">
+      <geom type="cylinder" size="0.06 0.08" material="mat_wood_dark"/>
+      <geom type="ellipsoid" pos="0 0 0.12" size="0.07 0.07 0.1" material="mat_plant"/>
+    </body>
+
+    <body name="zabuton_1" pos="3.5 -1.2 0.05">
+      <geom type="box" size="0.45 0.45 0.05" material="mat_fabric"/>
+    </body>
+    <body name="zabuton_2" pos="3.5 -3.8 0.05">
+      <geom type="box" size="0.45 0.45 0.05" material="mat_fabric"/>
+    </body>
+    <body name="zabuton_3" pos="4.8 -2.5 0.05">
+      <geom type="box" size="0.45 0.45 0.05" material="mat_fabric"/>
+    </body>
+    <body name="zabuton_4" pos="2.2 -2.5 0.05">
+      <geom type="box" size="0.45 0.45 0.05" material="mat_fabric"/>
+    </body>
+
+    <!-- New Sofa (Facing TV, behind Chabudai) -->
+    <body name="sofa_main" pos="1.5 -2.5 0.25">
+      <!-- Base -->
+      <geom type="box" size="0.5 1.2 0.25" material="mat_fabric" rgba="0.7 0.7 0.65 1"/>
+      <!-- Backrest -->
+      <geom type="box" pos="-0.4 0 0.4" size="0.1 1.2 0.4" material="mat_fabric" rgba="0.65 0.65 0.6 1"/>
+      <!-- Armrests -->
+      <geom type="box" pos="0 1.1 0.2" size="0.5 0.1 0.2" material="mat_fabric" rgba="0.65 0.65 0.6 1"/>
+      <geom type="box" pos="0 -1.1 0.2" size="0.5 0.1 0.2" material="mat_fabric" rgba="0.65 0.65 0.6 1"/>
+    </body>
+
+    <body name="tv_shelf" pos="7 -2.5 0.4">
+      <geom type="box" size="0.3 1.2 0.4" material="mat_wood_dark"/>
+      <!-- TV Frame -->
+      <geom type="box" pos="-0.15 0 0.6" size="0.02 0.9 0.35" rgba="0.1 0.1 0.1 1"/>
+      <!-- TV Screen Surface (Facing West) -->
+      <geom name="screen_geom" type="box" pos="-0.171 0 0.6" size="0.001 0.88 0.33" material="mat_screen"/>
+    </body>
+
+    <!-- Partition Screen (Separating TV area and Plant Room) -->
+    <body name="plant_room_screen" pos="5.5 -4.5 1">
+      <geom type="box" size="2.5 0.05 1" material="mat_wood_dark" rgba="0.5 0.3 0.1 0.8"/> <!-- Semi-transparent wood screen -->
+      <geom type="box" pos="0 0 0" size="2.4 0.06 0.9" material="mat_fabric" rgba="0.9 0.9 0.8 0.6"/> <!-- Paper/Fabric insert -->
+    </body>
+
+    <!-- Plant Room (South East Corner) -->
+    
+    <!-- Central Table for Medium Plants -->
+    <body name="plant_table" pos="6.5 -7.5 0.4">
+      <geom type="box" size="0.6 1.2 0.4" material="mat_wood_dark"/>
+    </body>
+
+    <!-- Wall Shelves for Small Plants (High up) -->
+    <body name="plant_shelf_1" pos="7.7 -6.0 1.5">
+      <geom type="box" size="0.25 0.6 0.02" material="mat_wood_dark"/>
+    </body>
+    <body name="plant_shelf_2" pos="7.7 -8.5 1.5">
+      <geom type="box" size="0.25 0.6 0.02" material="mat_wood_dark"/>
+    </body>
+
+    <!-- PLANTS -->
+
+    <!-- Large Tree (Floor) -->
+    <body name="bonsai_large_tree" pos="7.2 -9.0 0">
+       <geom type="cylinder" pos="0 0 0.3" size="0.08 0.3" material="mat_wood_dark"/> <!-- Trunk -->
+       <geom type="ellipsoid" pos="0 0 1.0" size="0.5 0.5 0.6" material="mat_plant"/> <!-- Foliage -->
+       <geom type="cylinder" pos="0 0 0.1" size="0.25 0.15" material="mat_pot"/> <!-- Pot -->
+    </body>
+
+    <!-- Medium Plants (Table) -->
+    <body name="bonsai_med_1" pos="6.5 -6.8 0.85">
+       <geom type="cylinder" pos="0 0 0.05" size="0.1 0.1" material="mat_pot"/>
+       <geom type="capsule" pos="0 0 0.25" size="0.02 0.15" material="mat_plant"/> <!-- Stem -->
+       <geom type="sphere" pos="0 0 0.45" size="0.12" material="mat_flower_red"/> <!-- Flower -->
+    </body>
+    <body name="bonsai_med_2" pos="6.5 -7.5 0.85">
+       <geom type="box" pos="0 0 0.05" size="0.1 0.1 0.1" material="mat_pot"/>
+       <geom type="cylinder" pos="0 0 0.25" size="0.03 0.15" material="mat_plant"/>
+       <geom type="ellipsoid" pos="0 0.1 0.4" size="0.1 0.05 0.05" material="mat_flower_yellow"/> <!-- Leaf/Flower -->
+       <geom type="ellipsoid" pos="0 -0.1 0.4" size="0.1 0.05 0.05" material="mat_flower_yellow"/>
+    </body>
+    <body name="bonsai_med_3" pos="6.5 -8.2 0.85">
+       <geom type="cylinder" pos="0 0 0.08" size="0.12 0.08" material="mat_pot"/>
+       <geom type="sphere" pos="0 0 0.25" size="0.15" material="mat_plant"/> <!-- Bushy -->
+    </body>
+
+    <!-- Small Plants (Shelves) -->
+    <body name="bonsai_small_1" pos="7.7 -5.8 1.55">
+       <geom type="box" pos="0 0 0.04" size="0.05 0.05 0.04" material="mat_pot"/>
+       <geom type="capsule" pos="0 0 0.12" size="0.01 0.05" material="mat_plant"/>
+    </body>
+    <body name="bonsai_small_2" pos="7.7 -6.2 1.55">
+       <geom type="cylinder" pos="0 0 0.04" size="0.05 0.04" material="mat_pot"/>
+       <geom type="sphere" pos="0 0 0.12" size="0.06" material="mat_flower_purple"/>
+    </body>
+    <body name="bonsai_small_3" pos="7.7 -8.3 1.55">
+       <geom type="cylinder" pos="0 0 0.04" size="0.05 0.04" material="mat_pot"/>
+       <geom type="ellipsoid" pos="0 0 0.15" size="0.04 0.08 0.08" material="mat_plant"/> <!-- Cactus-like -->
+    </body>
+    <body name="bonsai_small_4" pos="7.7 -8.7 1.55">
+       <geom type="box" pos="0 0 0.04" size="0.06 0.06 0.04" material="mat_pot"/>
+       <geom type="capsule" pos="0 0 0.15" size="0.01 0.08" material="mat_flower_red"/>
+    </body>
+
+    <!-- Open Kitchen (Opposite TV, West Side) -->
+    <body name="kitchen_counter_island" pos="-4 -2.5 0.45">
+      <geom type="box" size="1.0 2.0 0.45" material="mat_wall" rgba="0.9 0.9 0.9 1"/> <!-- White Counter -->
+      <geom type="box" pos="0 0 0.46" size="1.05 2.05 0.02" material="mat_stone"/> <!-- Stone Top -->
+      
+      <!-- Sink -->
+      <geom type="box" pos="0 1.0 0.48" size="0.4 0.6 0.05" rgba="0.2 0.2 0.2 1"/> <!-- Sink Basin -->
+      <geom type="cylinder" pos="0.5 1.0 0.6" size="0.03 0.15" material="mat_metal"/> <!-- Faucet -->
+
+      <!-- Stove -->
+      <geom type="box" pos="0 -1.0 0.49" size="0.4 0.4 0.02" rgba="0.1 0.1 0.1 1"/>
+      <geom type="cylinder" pos="0.2 -1.0 0.51" size="0.1 0.01" rgba="0.3 0.1 0.1 1"/>
+      <geom type="cylinder" pos="-0.2 -1.0 0.51" size="0.1 0.01" rgba="0.3 0.1 0.1 1"/>
+    </body>
+
+    <body name="fridge" pos="-7 -4 1.0">
+      <geom type="box" size="0.4 0.45 1.0" material="mat_metal" rgba="0.8 0.8 0.85 1"/>
+      <geom type="box" pos="0.41 0.05 0.2" size="0.02 0.4 0.7" rgba="0.85 0.85 0.9 1"/> <!-- Top Door -->
+      <geom type="box" pos="0.41 0.05 -0.7" size="0.02 0.4 0.25" rgba="0.85 0.85 0.9 1"/> <!-- Bottom Door -->
+      <geom type="cylinder" pos="0.45 -0.3 0.2" size="0.02 0.15" material="mat_metal"/> <!-- Handle -->
+    </body>
+
+    <!-- Kitchen Block (Old one removed/commented out) -->
+    <!-- <body name="kitchen_block" pos="-6.5 3.5 0.45"> ... </body> -->
+
+    <!-- Dining Table (Moved to Center Zone) -->
+    <body name="dining_table" pos="0 3.5 0.75">
+      <geom type="box" size="1.1 0.7 0.05" material="mat_wood_dark"/>
+      <geom type="box" pos="1.0 0 -0.5" size="0.08 0.08 0.5" material="mat_wood_dark"/>
+      <geom type="box" pos="-1.0 0 -0.5" size="0.08 0.08 0.5" material="mat_wood_dark"/>
+      <geom type="box" pos="0 0.55 -0.5" size="0.08 0.08 0.5" material="mat_wood_dark"/>
+      <geom type="box" pos="0 -0.55 -0.5" size="0.08 0.08 0.5" material="mat_wood_dark"/>
+    </body>
+    <body name="dining_chair_1" pos="0 4.6 0.45">
+      <geom type="box" size="0.25 0.25 0.05" material="mat_wood_dark"/>
+      <geom type="box" pos="0 0 0.4" size="0.25 0.02 0.35" material="mat_wood_dark"/>
+    </body>
+    <body name="dining_chair_2" pos="0 2.4 0.45">
+      <geom type="box" size="0.25 0.25 0.05" material="mat_wood_dark"/>
+      <geom type="box" pos="0 0 0.4" size="0.25 0.02 0.35" material="mat_wood_dark"/>
+    </body>
+
+    <body name="chandelier_living" pos="0 -2.5 2.4">
+      <geom type="cylinder" size="0.03 0.4" material="mat_metal"/>
+      <geom type="ellipsoid" pos="0 0 -0.4" size="0.4 0.4 0.12" material="mat_glass"/>
+    </body>
+
+    <body name="chandelier_dining" pos="0 3.5 2.4">
+      <geom type="cylinder" size="0.03 0.4" material="mat_metal"/>
+      <geom type="ellipsoid" pos="0 0 -0.4" size="0.35 0.35 0.12" material="mat_glass"/>
+    </body>
+
+    <!-- Master Bedroom Furniture -->
+    <body name="futon" pos="6.4 3.5 0.18">
+      <geom type="box" size="1.6 1.2 0.06" material="mat_fabric"/>
+      <geom type="box" pos="0 0.9 0.07" size="1.0 0.25 0.04" material="mat_fabric"/>
+    </body>
+    <body name="bedside_left" pos="6.4 5.0 0.35">
+      <geom type="box" size="0.3 0.25 0.3" material="mat_wood_dark"/>
+      <geom type="cylinder" pos="0 0 0.35" size="0.05 0.08" material="mat_metal"/>
+      <geom type="ellipsoid" pos="0 0 0.5" size="0.12 0.12 0.12" material="mat_glass"/>
+    </body>
+
+    <!-- Child Bedroom (North East) -->
+    <body name="child_bed" pos="7.0 7.0 0.2">
+      <geom type="box" size="0.6 1.0 0.15" material="mat_fabric" rgba="0.6 0.8 0.9 1"/> <!-- Blue Bed -->
+      <geom type="box" pos="0 0.8 0.1" size="0.5 0.2 0.05" rgba="1 1 1 1"/> <!-- Pillow -->
+    </body>
+    <body name="child_desk" pos="7.0 9.0 0.35">
+      <geom type="box" size="0.6 0.3 0.35" material="mat_wood_dark"/>
+    </body>
+
+    <!-- Bathroom Furniture -->
+    <body name="toilet" pos="-7 6 0.3">
+       <geom type="box" size="0.25 0.35 0.25" material="mat_wall"/>
+       <geom type="box" pos="0 -0.3 0.3" size="0.25 0.1 0.4" material="mat_wall"/>
+       <geom type="cylinder" pos="0 0 0.25" size="0.2 0.05" rgba="1 1 1 1"/>
+    </body>
+    <body name="bath_tub" pos="-6.5 9 0.4">
+       <geom type="box" size="1.2 0.6 0.4" material="mat_tile"/>
+       <geom type="box" pos="0 0 0.1" size="1.0 0.4 0.3" rgba="0.8 0.9 1 0.5"/> <!-- Water -->
+    </body>
+    <body name="towel_rack" pos="-7.9 8 1.5">
+       <geom type="cylinder" size="0.02 0.4" euler="90 0 0" material="mat_metal"/>
+       <geom type="box" pos="0 0 -0.2" size="0.01 0.3 0.2" material="mat_fabric"/>
+    </body>
+
+    <body name="washbasin" pos="-7.75 7.0 0.8">
+       <geom type="box" size="0.25 0.4 0.05" material="mat_ceramic"/> <!-- Basin Counter -->
+       <geom type="box" pos="0 0 -0.05" size="0.2 0.35 0.05" material="mat_ceramic" rgba="0.8 0.8 0.85 1"/> <!-- Bowl inset visual -->
+       <geom type="cylinder" pos="-0.15 0 0.1" size="0.02 0.1" material="mat_metal"/> <!-- Faucet Stem (Back/Wall side) -->
+       <geom type="cylinder" pos="-0.05 0 0.18" size="0.015 0.12" euler="0 45 0" material="mat_metal"/> <!-- Faucet Spout (Pointing Forward) -->
+    </body>
+
+    <body name="bathroom_mirror" pos="-7.95 7.0 1.2"> <!-- Top at 1.55, Bottom at 0.85 -> Center 1.2, Size Z 0.35 -->
+       <geom type="box" size="0.02 0.4 0.35" material="mat_mirror"/>
+    </body>
+
+
+    <!-- Genkan Furniture -->
+    <body name="genkan_step" pos="-4.5 -8.5 -0.02">
+      <geom type="box" size="1.0 0.8 0.03" material="mat_floor_wood"/>
+    </body>
+    <body name="genkan_shoe_cabinet" pos="-7.75 -8.5 0.5">
+      <geom type="box" size="0.25 0.8 0.5" material="mat_wood_dark"/>
+    </body>
+    <body name="genkan_bench" pos="-3.6 -7.5 0.25">
+      <geom type="box" size="0.7 0.25 0.25" material="mat_wood_dark"/>
+    </body>
+    <body name="corridor_screen" pos="2.5 -7.5 1">
+      <geom type="box" size="0.05 1 1" material="mat_wood_dark"/>
+    </body>
+
+    <!-- Courtyard Furniture (Removed) -->
+    <!-- <body name="courtyard_tree" ...> -->
+
+
+    <!-- Robot & Blocks -->
+    <body name="block_1" pos="-1 0.5 0.15">
+      <freejoint/>
+      <geom type="box" size="0.15 0.15 0.15" material="mat_wood_dark" mass="1"/>
+    </body>
+    <body name="block_2" pos="1 -0.5 0.15">
+      <freejoint/>
+      <geom type="box" size="0.15 0.15 0.15" material="mat_wood_dark" mass="1"/>
+    </body>
+
+    <body name="vacuum_base" pos="0 0 0.1">
+      <freejoint/>
+      <geom name="vacuum_body" type="cylinder" pos="0 0 0.02" size="0.3 0.06" material="mat_metal" mass="4"/>
+      <body name="vacuum_wheel_left" pos="0 0.22 0">
+        <joint name="vacuum_wheel_left_hinge" type="hinge" axis="0 1 0"/>
+        <geom type="sphere" size="0.06" material="mat_metal" mass="0.2" friction="1.5 0.005 0.0001"/>
+      </body>
+      <body name="vacuum_wheel_right" pos="0 -0.22 0">
+        <joint name="vacuum_wheel_right_hinge" type="hinge" axis="0 1 0"/>
+        <geom type="sphere" size="0.06" material="mat_metal" mass="0.2" friction="1.5 0.005 0.0001"/>
+      </body>
+      
+      <geom name="caster_front" type="sphere" pos="0.25 0 -0.01" size="0.05" rgba="0.5 0.5 0.5 1" friction="0 0 0" mass="0.1"/>
+      <geom name="caster_back"  type="sphere" pos="-0.25 0 -0.01" size="0.05" rgba="0.5 0.5 0.5 1" friction="0 0 0" mass="0.1"/>
+
+      <site name="vacuum_rf_front"  pos="0.32 0 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4"/>
+          <site name="vacuum_rf_front_left"  pos="0.25 0.25 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4" zaxis="1 1 0"/>
+          <site name="vacuum_rf_front_right" pos="0.25 -0.25 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4" zaxis="1 -1 0"/>
+          <site name="vacuum_rf_back"   pos="-0.32 0 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4"/>
+      <site name="vacuum_rf_left"   pos="0 0.32 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4"/>
+      <site name="vacuum_rf_right"  pos="0 -0.32 0.08" size="0.02" type="ellipsoid" rgba="0 1 0 0.4"/>
+    </body>
+
+  </worldbody>
+
+  <actuator>
+    <motor name="vacuum_motor_left"  joint="vacuum_wheel_left_hinge"  gear="50"/>
+    <motor name="vacuum_motor_right" joint="vacuum_wheel_right_hinge" gear="50"/>
+  </actuator>
+
+  <sensor>
+    <rangefinder name="rf_front" site="vacuum_rf_front"/>
+    <rangefinder name="rf_front_left" site="vacuum_rf_front_left"/>
+    <rangefinder name="rf_front_right" site="vacuum_rf_front_right"/>
+    <rangefinder name="rf_back"  site="vacuum_rf_back"/>
+    <rangefinder name="rf_left"  site="vacuum_rf_left"/>
+    <rangefinder name="rf_right" site="vacuum_rf_right"/>
+  </sensor>
+</mujoco>
